@@ -15,9 +15,6 @@ jobs:
       id: build-image
       run: docker build . --file Dockerfile --tag my-pythonapp:latest
 
-    - name: Tag the Docker image for ECR
-      run: docker tag my-pythonapp:latest 795455480696.dkr.ecr.eu-north-1.amazonaws.com/my-pythonapp:latest
-
     - name: Push to ECR
       id: ecr
       uses: jwalton/gh-ecr-push@v2
@@ -25,7 +22,7 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-north-1
-        image: 795455480696.dkr.ecr.eu-north-1.amazonaws.com/my-pythonapp:latest
+        image: my-pythonapp:latest
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
