@@ -13,7 +13,7 @@ jobs:
 
     - name: Build the Docker image
       id: build-image
-      run: docker build . --file Dockerfile --tag my-pythonapp:latest
+      run: docker build . --file Dockerfile --tag my-pythonapp1:latest
 
     - name: Push to ECR
       id: ecr
@@ -22,7 +22,7 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-north-1
-        image: my-pythonapp:latest
+        image: my-pythonapp1:latest
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
