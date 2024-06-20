@@ -13,7 +13,7 @@ jobs:
 
     - name: Build the Docker image
       id: build-image
-      run: docker build . --file Dockerfile --tag my-pythonapp1:latest
+      run: docker build . --file Dockerfile --tag my-pythonapp:${{ github.run_number }}
 
     - name: Push to ECR
       id: ecr
@@ -22,7 +22,7 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-north-1
-        image: my-pythonapp1:latest
+        image: my-pythonapp:${{ github.run_number }}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -33,7 +33,7 @@ jobs:
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       run: |
-        sed -i 's/PLACEHOLDER_TAG/latest/' .aws/task-definition.json
+        sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.jsonn
     - name: Debug rendered task definition
       run: cat .aws/task-definition.json
 
@@ -41,6 +41,6 @@ jobs:
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ".aws/task-definition.json"
-        service: "python-2"
+        service: "ecr-push"
         cluster: "test"
         wait-for-service-stability: true
