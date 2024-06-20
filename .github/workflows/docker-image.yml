@@ -3,8 +3,6 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  #pull_request:
-    #branches: [ "main" ]
 
 jobs:
   build:
@@ -13,18 +11,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
     - name: Build the Docker image
       id: build-image
       run: docker build . --file Dockerfile --tag my-pythonapp:${{ github.run_number }}
 
-    - name: Tag the Docker image
-      run: docker tag my-pythonapp:${{ github.run_number }} hassanb111/my-pythonapp:${{ github.run_number }}
+    - name: Tag the Docker image for ECR
+      run: docker tag my-pythonapp:${{ github.run_number }} 795455480696.dkr.ecr.eu-north-1.amazonaws.com/my-pythonapp:${{ github.run_number }}
 
-    - name: Push the Docker image
-      run: docker push hassanb111/my-pythonapp:${{ github.run_number }}
+    - name: Push to ECR
+      id: ecr
+      uses: jwalton/gh-ecr-push@v2
+      with:
+        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: eu-north-1
+        image: 795455480696.dkr.ecr.eu-north-1.amazonaws.com/my-pythonapp:${{ github.run_number }}
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -36,7 +37,6 @@ jobs:
     - name: Fill in the new image ID in the Amazon ECS task definition
       run: |
         sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.json
-
     - name: Debug rendered task definition
       run: cat .aws/task-definition.json
 
