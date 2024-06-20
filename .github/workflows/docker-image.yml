@@ -28,13 +28,13 @@ jobs:
       env:
         REGISTRY: 795455480696.dkr.ecr.eu-north-1.amazonaws.com
         REPOSITORY: my-pythonapp
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: ${{ github.run_number }}
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     - name: Update ECS task definition with new image ID
-      run: sed -i 's/PLACEHOLDER_TAG/${{ github.sha }}/' .aws/task-definition.json
+      run: sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.json
 
     - name: Debug rendered task definition
       run: cat .aws/task-definition.json
