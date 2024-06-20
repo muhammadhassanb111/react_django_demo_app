@@ -11,11 +11,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Log in to Amazon ECR
-      run: |
-        aws sts get-caller-identity --output json --region eu-north-1
-        aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 795455480696.dkr.ecr.eu-north-1.amazonaws.com
-
     - name: Build the Docker image
       id: build-image
       run: docker build . --file Dockerfile --tag my-pythonapp:latest
@@ -42,7 +37,6 @@ jobs:
     - name: Fill in the new image ID in the Amazon ECS task definition
       run: |
         sed -i 's/PLACEHOLDER_TAG/latest/' .aws/task-definition.json
-        
     - name: Debug rendered task definition
       run: cat .aws/task-definition.json
 
