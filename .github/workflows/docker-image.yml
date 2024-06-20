@@ -33,7 +33,7 @@ jobs:
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       run: |
-        sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.jsonn
+        sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.json
     - name: Debug rendered task definition
       run: cat .aws/task-definition.json
 
