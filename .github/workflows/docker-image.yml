@@ -7,11 +7,11 @@ on:
 
 jobs:
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -30,20 +30,19 @@ jobs:
         REPOSITORY: my-pythonapp
         IMAGE_TAG: ${{ github.run_number }}
       run: |
-        docker build -t ${env:REGISTRY}/${env:REPOSITORY}:${env:IMAGE_TAG} .
-        docker push ${env:REGISTRY}/${env:REPOSITORY}:${env:IMAGE_TAG}
+        docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     - name: Update ECS task definition with new image ID
-      run: |
-        (Get-Content .aws/task-definition.json) -replace 'PLACEHOLDER_TAG', '${{ github.run_number }}' | Set-Content .aws/task-definition.json
+      run: sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.json
 
     - name: Debug rendered task definition
-      run: type .aws/task-definition.json
+      run: cat .aws/task-definition.json
 
     - name: Deploy ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1.1.0
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ".aws/task-definition.json"
-        service: "ecr-push"
+        service: "ecr-pus"
         cluster: "test"
         wait-for-service-stability: true
