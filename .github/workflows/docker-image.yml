@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repo
@@ -37,12 +37,12 @@ jobs:
       run: sed -i 's/PLACEHOLDER_TAG/${{ github.run_number }}/' .aws/task-definition.json
 
     - name: Debug rendered task definition
-      run: cat .aws/task-definition.json
+      run: type .aws/task-definition.json
 
     - name: Deploy ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ".aws/task-definition.json"
-        service: "ecr-push"
+        service: "ecr-pus"
         cluster: "test"
         wait-for-service-stability: true
